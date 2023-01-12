@@ -14,35 +14,46 @@ import CustomButton from './CustomButton';
 function Cart() {
   const { data } = useFetch(process.env.NEXT_PUBLIC_PRODUCTS_URL);
   const [cart] = useGetLSCart();
+  const cartPrices = cart?.map((each) => {
+    const foundItem = data?.data?.find((item) => item.id === each.id);
+    return {...each, price: foundItem?.price * each.quantity}
+  })
+  console.log(cartPrices);
   const dataContext = useContext(DataContext);
   console.log(cart, data);
   return (
-    <Box className="w-1/4 myShadow rounded-xl sticky top-6 px-2 max-h-[500px] overflow-auto">
+    <Box className="w-1/4 myShadow rounded-xl sticky top-6 px-4 pb-4 max-h-[500px] overflow-auto">
       <h3 className="text-center text-2xl"> Your Cart </h3>
-      {cart?.length ? cart?.map((item) => {
-        const completeItemDetails = data?.data?.find((each) => each.id === item.id);
-        const isLastItem = item.id === cart[cart.length - 1].id;
-        return (
-          <CartItems
-            key={item.id}
-            isLastItem={isLastItem}
-            item={item}
-            completeItemDetails={completeItemDetails}
-          />
-        );
-      })
+      {cart?.length 
+      ? 
+        <>
+          {cart?.map((item) => {
+            const completeItemDetails = data?.data?.find((each) => each.id === item.id);
+            const isLastItem = item.id === cart[cart.length - 1].id;
+            return (
+              <Box key={item.id}>
+                <CartItem
+                  key={item.id}
+                  isLastItem={isLastItem}
+                  item={item}
+                  completeItemDetails={completeItemDetails}
+                />
+              </Box>
+            );
+          })}
+          <Box className="flex justify-center" mt={4}>
+            <CustomButton onClick={() => null}>
+              {`Order ${cart?.length} for NGN ${(cartPrices?.reduce((a, b) => a + b.price, 0)) ?? 'Loading...'}`}
+            </CustomButton>
+          </Box>
+        </>
         : <EmptyState />}
 
-      <Box mt={4}>
-        <CustomButton onClick={() => null}>
-          {`Order ${cart?.length} for NGN ${(cart?.reduce((a, b) => a + b.price))}`}
-        </CustomButton>
-      </Box>
     </Box>
   );
 }
 
-function CartItems({ item, completeItemDetails, isLastItem }) {
+function CartItem({ item, completeItemDetails, isLastItem }) {
   return (
     <>
       <Stack
@@ -68,7 +79,7 @@ function CartItems({ item, completeItemDetails, isLastItem }) {
           <p>
             NGN
             {' '}
-            {completeItemDetails?.price * item?.quantity}
+            {(completeItemDetails?.price * item?.quantity) ?? 'Loading...'}
           </p>
         </Box>
       </Stack>
