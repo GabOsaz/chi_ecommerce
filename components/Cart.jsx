@@ -79,7 +79,7 @@ function CartItem({ item, completeItemDetails, isLastItem }) {
           <p>
             NGN
             {' '}
-            {(completeItemDetails?.price * item?.quantity) ?? 'Loading...'}
+            {completeItemDetails?.price ? (completeItemDetails?.price * item?.quantity) : 'Loading...'}
           </p>
         </Box>
       </Stack>
