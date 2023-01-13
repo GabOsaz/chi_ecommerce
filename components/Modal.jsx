@@ -17,11 +17,10 @@ function CustomModal({
 }) {
   const dataContext = useContext(DataContext);
   const { quantity, setQuantity } = dataContext;
+  useResetQty(setQuantity, open);
   const handleClose = () => {
     setOpen(false);
   };
-
-  useResetQty(setQuantity, open);
 
   const style = {
     position: 'absolute',
@@ -75,15 +74,20 @@ function CustomModal({
                 <IconButton setQuantity={() => setQuantity((prev) => prev - 1)} qty={quantity}>
                   <RemoveIcon />
                 </IconButton>
-                <p>
+                <p data-testid="quantity">
                   {quantity}
                 </p>
-                <IconButton qty={quantity + 1} setQuantity={() => setQuantity((prev) => prev + 1)}>
-                  <AddIcon />
-                </IconButton>
+                <Box data-testid="increase_btn">
+                  <IconButton
+                    qty={quantity + 1}
+                    setQuantity={() => setQuantity((prev) => prev + 1)}
+                  >
+                    <AddIcon />
+                  </IconButton>
+                </Box>
               </Stack>
               <Box mt={4}>
-                <CustomButton onClick={() => addToCart(data?.id, quantity, setOpen)}>
+                <CustomButton data-testid="add_btn" onClick={() => addToCart(data?.id, quantity, setOpen)}>
                   {`Add ${quantity} for NGN ${(data?.price * quantity).toFixed(2)}`}
                 </CustomButton>
               </Box>

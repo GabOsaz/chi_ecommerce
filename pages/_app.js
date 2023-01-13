@@ -4,6 +4,8 @@ import Head from 'next/head';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { CacheProvider } from '@emotion/react';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import theme from '../config/theme';
 import createEmotionCache from '../config/cache';
 import { DataProvider } from '../AppContext/DataContext';
@@ -22,6 +24,7 @@ export default function MyApp(props) {
         <CssBaseline />
         <DataProvider>
           <Component {...pageProps} />
+          <ToastContainer />
         </DataProvider>
       </ThemeProvider>
     </CacheProvider>

@@ -1,3 +1,5 @@
+import { toast } from 'react-toastify';
+
 const addToCart = (id, quantity, setOpen) => {
   const newCartItem = { id, quantity };
   // Check if cart exists in local storage
@@ -16,6 +18,7 @@ const addToCart = (id, quantity, setOpen) => {
     }
   }
   window.dispatchEvent(new Event('cart'));
+  toast.info('1 item added to cart!');
   setOpen(false);
 };
 

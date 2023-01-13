@@ -1,8 +1,10 @@
+/* eslint-disable consistent-return */
 import { useEffect, useState } from 'react';
 
 function useGetLSCart() {
   const [cart, setCart] = useState(null);
   useEffect(() => {
+    // const isEmpty = !!localStorage.getItem('cart');
     const listenCartChange = () => {
       if (typeof window !== 'undefined') {
         const lsCart = JSON.parse(localStorage.getItem('cart'));

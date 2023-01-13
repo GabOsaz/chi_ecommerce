@@ -1,52 +1,53 @@
 /* eslint-disable no-unsafe-optional-chaining */
-import { useContext } from 'react';
+import { useRouter } from 'next/router';
 import { Box, Stack } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import useFetch from '../customHooks/useFetch';
 import useGetLSCart from '../customHooks/useGetLSCart';
-import { DataContext } from '../AppContext/DataContext';
 import CartIconBtn from './CartIconBtn';
 import removeFromCart from '../actions/removeFromCart';
 import increaseCartItemQty from '../actions/increaseCartItemQty';
 import CustomButton from './CustomButton';
+import getTotalOrderPrice from '../helpers/getTotalOrderPrice';
 
 function Cart() {
   const { data } = useFetch(process.env.NEXT_PUBLIC_PRODUCTS_URL);
   const [cart] = useGetLSCart();
+  const router = useRouter();
   const cartPrices = cart?.map((each) => {
     const foundItem = data?.data?.find((item) => item.id === each.id);
-    return {...each, price: foundItem?.price * each.quantity}
-  })
-  console.log(cartPrices);
-  const dataContext = useContext(DataContext);
-  console.log(cart, data);
+    return { ...each, price: foundItem?.price * each.quantity };
+  });
+  const totalPrice = getTotalOrderPrice(cartPrices);
+
   return (
-    <Box className="w-1/4 myShadow rounded-xl sticky top-6 px-4 pb-4 max-h-[500px] overflow-auto">
+    <Box className="w-1/4 myShadow rounded-xl sticky top-0 px-4 pb-4 max-h-[500px] overflow-auto">
       <h3 className="text-center text-2xl"> Your Cart </h3>
-      {cart?.length 
-      ? 
-        <>
-          {cart?.map((item) => {
-            const completeItemDetails = data?.data?.find((each) => each.id === item.id);
-            const isLastItem = item.id === cart[cart.length - 1].id;
-            return (
-              <Box key={item.id}>
-                <CartItem
-                  key={item.id}
-                  isLastItem={isLastItem}
-                  item={item}
-                  completeItemDetails={completeItemDetails}
-                />
-              </Box>
-            );
-          })}
-          <Box className="flex justify-center" mt={4}>
-            <CustomButton onClick={() => null}>
-              {`Order ${cart?.length} for NGN ${(cartPrices?.reduce((a, b) => a + b.price, 0)) ?? 'Loading...'}`}
-            </CustomButton>
-          </Box>
-        </>
+      {data.data?.length && cart?.length
+        ? (
+          <>
+            {cart?.map((item) => {
+              const completeItemDetails = data?.data?.find((each) => each.id === item.id);
+              const isLastItem = item.id === cart[cart.length - 1].id;
+              return (
+                <Box key={item.id}>
+                  <CartItem
+                    key={item.id}
+                    isLastItem={isLastItem}
+                    item={item}
+                    completeItemDetails={completeItemDetails}
+                  />
+                </Box>
+              );
+            })}
+            <Box data-testid="order_btn" className="flex justify-center" mt={4}>
+              <CustomButton onClick={() => router.push('/checkout')}>
+                {`Order ${cart?.length} for NGN ${totalPrice}`}
+              </CustomButton>
+            </Box>
+          </>
+        )
         : <EmptyState />}
 
     </Box>
@@ -65,7 +66,7 @@ function CartItem({ item, completeItemDetails, isLastItem }) {
         className="text-sm"
       >
         <Box>
-          <p className="font-semibold">
+          <p data-testid="quantity_at_cart" className="font-semibold">
             {item?.quantity}
             x
           </p>
@@ -84,12 +85,16 @@ function CartItem({ item, completeItemDetails, isLastItem }) {
         </Box>
       </Stack>
       <div className="flex justify-between items-center py-4">
-        <CartIconBtn handleClick={() => removeFromCart(item?.id, item?.quantity)}>
-          <RemoveIcon />
-        </CartIconBtn>
-        <CartIconBtn handleClick={() => increaseCartItemQty(item?.id)}>
-          <AddIcon />
-        </CartIconBtn>
+        <Box data-testid="reduce_qty_btn">
+          <CartIconBtn handleClick={() => removeFromCart(item?.id, item?.quantity)}>
+            <RemoveIcon />
+          </CartIconBtn>
+        </Box>
+        <Box data-testid="add_qty_btn">
+          <CartIconBtn handleClick={() => increaseCartItemQty(item?.id)}>
+            <AddIcon />
+          </CartIconBtn>
+        </Box>
       </div>
       {!isLastItem ? <hr /> : null}
     </>
