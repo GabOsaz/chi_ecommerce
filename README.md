@@ -1,4 +1,4 @@
-# Project Title
+# Chi Mart
 
 An e-commerce demo application heavy on the use of local storage for application-level state cart management.
 
